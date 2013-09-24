@@ -27,9 +27,12 @@ function donozbe(command, onend ){
       // handle the response
       var ans = '';
       response.on('data', function(chunk) {
-        ans += chunk;
+          ans += chunk;
       });
-      response.on('end', onend );
+      response.on('end', function(){
+          var obj = JSON.parse(ans);
+          onend(obj);
+      });
     });
     req.on('error', function(e) {
       console.log("Got error: " + e.message);
@@ -38,23 +41,11 @@ function donozbe(command, onend ){
 
 
 function projects() {
-    nozbe.path="/api/projects/key-"+process.env.NOZBE_API_KEY
-    var req = https.get(nozbe, function(response) {
-      // handle the response
-      var ans = '';
-      response.on('data', function(chunk) {
-        ans += chunk;
-      });
-      response.on('end', function() {
-        var obj = JSON.parse(ans);
+    donozbe('projects', function(obj) {
         for(var i=0; i<obj.length; i++){
             proj = obj[i];
             console.log(i + ': ' + proj.name + "("+proj.count+")");
         }
-      });
-    });
-    req.on('error', function(e) {
-      console.log("Got error: " + e.message);
     });
 }
 
