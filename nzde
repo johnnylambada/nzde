@@ -50,46 +50,22 @@ function projects() {
 }
 
 function contexts() {
-    nozbe.path="/api/contexts/key-"+process.env.NOZBE_API_KEY
-    var req = https.get(nozbe, function(response) {
-      // handle the response
-      var ans = '';
-      response.on('data', function(chunk) {
-        ans += chunk;
-      });
-      response.on('end', function() {
-        var obj = JSON.parse(ans);
+    donozbe('contexts', function(obj) {
         for(var i=0; i<obj.length; i++){
             context = obj[i];
             console.log(i + ': ' + context.name + "("+context.count+")");
         }
-      });
-    });
-    req.on('error', function(e) {
-      console.log("Got error: " + e.message);
     });
 }
 
 function actions(){
-    nozbe.path="/api/actions/what-next/key-"+process.env.NOZBE_API_KEY
-    var req = https.get(nozbe, function(response) {
-      // handle the response
-      var ans = '';
-      response.on('data', function(chunk) {
-        ans += chunk;
-      });
-      response.on('end', function() {
-        var obj = JSON.parse(ans);
+    donozbe('actions/what-next', function(obj) {
         for(var i=0; i<obj.length; i++){
             action = obj[i];
             if (action.done==0){
                 console.log(i + ': ' + action.name );
             }
         }
-      });
-    });
-    req.on('error', function(e) {
-      console.log("Got error: " + e.message);
     });
 }
 
