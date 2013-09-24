@@ -30,5 +30,27 @@ process.argv.forEach(function (val, index, array) {
               console.log("Got error: " + e.message);
             });
             break;
+        case "contexts":
+        case "c":
+        case "con":
+            nozbe.path="/api/contexts/key-"+process.env.NOZBE_API_KEY
+            var req = https.get(nozbe, function(response) {
+              // handle the response
+              var ans = '';
+              response.on('data', function(chunk) {
+                ans += chunk;
+              });
+              response.on('end', function() {
+                var obj = JSON.parse(ans);
+                for(var i=0; i<obj.length; i++){
+                    proj = obj[i];
+                    console.log(i + ': ' + proj.name + "("+proj.count+")");
+                }
+              });
+            });
+            req.on('error', function(e) {
+              console.log("Got error: " + e.message);
+            });
+            break;
     }
 });
