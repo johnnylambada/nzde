@@ -12,12 +12,7 @@ var argv=optimist
     .alias('a','actions')
     .argv;
 
-var nozbe = {
-    host: 'webapp.nozbe.com',
-    port: 443
-};
-
-function donozbe(command, onend ){
+function nozbe(command, onend ){
     var opt = {
         host: 'webapp.nozbe.com',
         port: 443,
@@ -39,9 +34,8 @@ function donozbe(command, onend ){
     });
 }
 
-
 function projects() {
-    donozbe('projects', function(obj) {
+    nozbe('projects', function(obj) {
         for(var i=0; i<obj.length; i++){
             proj = obj[i];
             console.log(i + ': ' + proj.name + "("+proj.count+")");
@@ -50,7 +44,7 @@ function projects() {
 }
 
 function contexts() {
-    donozbe('contexts', function(obj) {
+    nozbe('contexts', function(obj) {
         for(var i=0; i<obj.length; i++){
             context = obj[i];
             console.log(i + ': ' + context.name + "("+context.count+")");
@@ -59,7 +53,7 @@ function contexts() {
 }
 
 function actions(){
-    donozbe('actions/what-next', function(obj) {
+    nozbe('actions/what-next', function(obj) {
         for(var i=0; i<obj.length; i++){
             action = obj[i];
             if (action.done==0){
