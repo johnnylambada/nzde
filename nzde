@@ -43,8 +43,32 @@ process.argv.forEach(function (val, index, array) {
               response.on('end', function() {
                 var obj = JSON.parse(ans);
                 for(var i=0; i<obj.length; i++){
-                    proj = obj[i];
-                    console.log(i + ': ' + proj.name + "("+proj.count+")");
+                    context = obj[i];
+                    console.log(i + ': ' + context.name + "("+context.count+")");
+                }
+              });
+            });
+            req.on('error', function(e) {
+              console.log("Got error: " + e.message);
+            });
+            break;
+        case "actions":
+        case "a":
+        case "act":
+            nozbe.path="/api/actions/what-next/key-"+process.env.NOZBE_API_KEY
+            var req = https.get(nozbe, function(response) {
+              // handle the response
+              var ans = '';
+              response.on('data', function(chunk) {
+                ans += chunk;
+              });
+              response.on('end', function() {
+                var obj = JSON.parse(ans);
+                for(var i=0; i<obj.length; i++){
+                    action = obj[i];
+                    if (action.done==0){
+                        console.log(i + ': ' + action.name );
+                    }
                 }
               });
             });
