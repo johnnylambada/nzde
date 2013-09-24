@@ -1,8 +1,15 @@
 #!/usr/bin/env node
 var https=require('https');
+var optimist = require('optimist');
 
-
-var argv=require('optimist')
+var argv=optimist
+    .usage("nozbe (GTD) from the command line", {
+        'projects': { short: 'p', boolean: true, description: "Display all projects" },
+        'contexts': { short: 'c', boolean: true, description: "Display all contexts" },
+        'actions':  { short: 'a', boolean: true, description: "Display all next actions" }})
+    .alias('p','projects')
+    .alias('c','contexts')
+    .alias('a','actions')
     .argv;
 
 var nozbe = {
@@ -10,75 +17,94 @@ var nozbe = {
     port: 443
 };
 
-argv._.forEach(function (val, index, array) {
-    switch(val){
-        case "projects":
-        case "p":
-        case "proj":
-            nozbe.path="/api/projects/key-"+process.env.NOZBE_API_KEY
-            var req = https.get(nozbe, function(response) {
-              // handle the response
-              var ans = '';
-              response.on('data', function(chunk) {
-                ans += chunk;
-              });
-              response.on('end', function() {
-                var obj = JSON.parse(ans);
-                for(var i=0; i<obj.length; i++){
-                    proj = obj[i];
-                    console.log(i + ': ' + proj.name + "("+proj.count+")");
-                }
-              });
-            });
-            req.on('error', function(e) {
-              console.log("Got error: " + e.message);
-            });
-            break;
-        case "contexts":
-        case "c":
-        case "con":
-            nozbe.path="/api/contexts/key-"+process.env.NOZBE_API_KEY
-            var req = https.get(nozbe, function(response) {
-              // handle the response
-              var ans = '';
-              response.on('data', function(chunk) {
-                ans += chunk;
-              });
-              response.on('end', function() {
-                var obj = JSON.parse(ans);
-                for(var i=0; i<obj.length; i++){
-                    context = obj[i];
-                    console.log(i + ': ' + context.name + "("+context.count+")");
-                }
-              });
-            });
-            req.on('error', function(e) {
-              console.log("Got error: " + e.message);
-            });
-            break;
-        case "actions":
-        case "a":
-        case "act":
-            nozbe.path="/api/actions/what-next/key-"+process.env.NOZBE_API_KEY
-            var req = https.get(nozbe, function(response) {
-              // handle the response
-              var ans = '';
-              response.on('data', function(chunk) {
-                ans += chunk;
-              });
-              response.on('end', function() {
-                var obj = JSON.parse(ans);
-                for(var i=0; i<obj.length; i++){
-                    action = obj[i];
-                    if (action.done==0){
-                        console.log(i + ': ' + action.name );
-                    }
-                }
-              });
-            });
-            req.on('error', function(e) {
-              console.log("Got error: " + e.message);
-            });
-            break;
-    }
-});
+function donozbe(command, onend ){
+    var opt = {
+        host: 'webapp.nozbe.com',
+        port: 443,
+        path: "/api/"+command+"/key-"+process.env.NOZBE_API_KEY
+    };
+    var req = https.get(opt, function(response) {
+      // handle the response
+      var ans = '';
+      response.on('data', function(chunk) {
+        ans += chunk;
+      });
+      response.on('end', onend );
+    });
+    req.on('error', function(e) {
+      console.log("Got error: " + e.message);
+    });
+}
+
+
+function projects() {
+    nozbe.path="/api/projects/key-"+process.env.NOZBE_API_KEY
+    var req = https.get(nozbe, function(response) {
+      // handle the response
+      var ans = '';
+      response.on('data', function(chunk) {
+        ans += chunk;
+      });
+      response.on('end', function() {
+        var obj = JSON.parse(ans);
+        for(var i=0; i<obj.length; i++){
+            proj = obj[i];
+            console.log(i + ': ' + proj.name + "("+proj.count+")");
+        }
+      });
+    });
+    req.on('error', function(e) {
+      console.log("Got error: " + e.message);
+    });
+}
+
+function contexts() {
+    nozbe.path="/api/contexts/key-"+process.env.NOZBE_API_KEY
+    var req = https.get(nozbe, function(response) {
+      // handle the response
+      var ans = '';
+      response.on('data', function(chunk) {
+        ans += chunk;
+      });
+      response.on('end', function() {
+        var obj = JSON.parse(ans);
+        for(var i=0; i<obj.length; i++){
+            context = obj[i];
+            console.log(i + ': ' + context.name + "("+context.count+")");
+        }
+      });
+    });
+    req.on('error', function(e) {
+      console.log("Got error: " + e.message);
+    });
+}
+
+function actions(){
+    nozbe.path="/api/actions/what-next/key-"+process.env.NOZBE_API_KEY
+    var req = https.get(nozbe, function(response) {
+      // handle the response
+      var ans = '';
+      response.on('data', function(chunk) {
+        ans += chunk;
+      });
+      response.on('end', function() {
+        var obj = JSON.parse(ans);
+        for(var i=0; i<obj.length; i++){
+            action = obj[i];
+            if (action.done==0){
+                console.log(i + ': ' + action.name );
+            }
+        }
+      });
+    });
+    req.on('error', function(e) {
+      console.log("Got error: " + e.message);
+    });
+}
+
+//console.dir(argv);
+
+if (argv.projects)       projects();
+else if (argv.contexts)  contexts();
+else if (argv.actions)   actions();
+else                     optimist.showHelp();
