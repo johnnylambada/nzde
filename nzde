@@ -1,12 +1,16 @@
 #!/usr/bin/env node
 var https=require('https');
+
+
+var argv=require('optimist')
+    .argv;
+
 var nozbe = {
     host: 'webapp.nozbe.com',
     port: 443
 };
 
-process.argv.forEach(function (val, index, array) {
-//  console.log(index + ': ' + val);
+argv._.forEach(function (val, index, array) {
     switch(val){
         case "projects":
         case "p":
