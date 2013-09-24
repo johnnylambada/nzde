@@ -1,0 +1,34 @@
+#!/usr/bin/env node
+var https=require('https');
+var nozbe = {
+    host: 'webapp.nozbe.com',
+    port: 443
+};
+
+process.argv.forEach(function (val, index, array) {
+//  console.log(index + ': ' + val);
+    switch(val){
+        case "projects":
+        case "p":
+        case "proj":
+            nozbe.path="/api/projects/key-"+process.env.NOZBE_API_KEY
+            var req = https.get(nozbe, function(response) {
+              // handle the response
+              var ans = '';
+              response.on('data', function(chunk) {
+                ans += chunk;
+              });
+              response.on('end', function() {
+                var obj = JSON.parse(ans);
+                for(var i=0; i<obj.length; i++){
+                    proj = obj[i];
+                    console.log(i + ': ' + proj.name + "("+proj.count+")");
+                }
+              });
+            });
+            req.on('error', function(e) {
+              console.log("Got error: " + e.message);
+            });
+            break;
+    }
+});
