@@ -1,16 +1,44 @@
 #!/usr/bin/env node
 var https=require('https');
-var optimist = require('optimist');
+var program = require('commander');
 
-var argv=optimist
-    .usage("nozbe (GTD) from the command line", {
-        'projects': { short: 'p', boolean: true, description: "Display all projects" },
-        'contexts': { short: 'c', boolean: true, description: "Display all contexts" },
-        'actions':  { short: 'a', boolean: true, description: "Display all next actions" }})
-    .alias('p','projects')
-    .alias('c','contexts')
-    .alias('a','actions')
-    .argv;
+program
+  .version('0.0.1')
+
+program.command('projects')
+  .description('display all projects')
+  .action(function(env, options){ 
+    nozbe('projects', function(obj) {
+        for(var i=0; i<obj.length; i++){
+            proj = obj[i];
+            console.log(i + ': ' + proj.name + "("+proj.count+")");
+        }
+    });
+  });
+
+program.command('contexts')
+  .description('display all contexts')
+  .action(function(env, options){ 
+    nozbe('contexts', function(obj) {
+        for(var i=0; i<obj.length; i++){
+            context = obj[i];
+            console.log(i + ': ' + context.name + "("+context.count+")");
+        }
+    });
+  });
+
+program.command('actions')
+  .description('display all actions')
+  .action(function(env, options){ 
+    nozbe('actions/what-next', function(obj) {
+        for(var i=0; i<obj.length; i++){
+            action = obj[i];
+            if (action.done==0){
+                console.log(i + ': ' + action.name );
+            }
+        }
+    });
+  });
 
 function nozbe(command, onend ){
     var opt = {
@@ -34,38 +62,6 @@ function nozbe(command, onend ){
     });
 }
 
-function projects() {
-    nozbe('projects', function(obj) {
-        for(var i=0; i<obj.length; i++){
-            proj = obj[i];
-            console.log(i + ': ' + proj.name + "("+proj.count+")");
-        }
-    });
-}
-
-function contexts() {
-    nozbe('contexts', function(obj) {
-        for(var i=0; i<obj.length; i++){
-            context = obj[i];
-            console.log(i + ': ' + context.name + "("+context.count+")");
-        }
-    });
-}
-
-function actions(){
-    nozbe('actions/what-next', function(obj) {
-        for(var i=0; i<obj.length; i++){
-            action = obj[i];
-            if (action.done==0){
-                console.log(i + ': ' + action.name );
-            }
-        }
-    });
-}
-
 //console.dir(argv);
 
-if (argv.projects)       projects();
-else if (argv.contexts)  contexts();
-else if (argv.actions)   actions();
-else                     optimist.showHelp();
+program.parse(process.argv)
