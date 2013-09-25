@@ -4,7 +4,7 @@
   "description": "CLI for nozbe written in javascript",
   "main": "./nzde.js",
   "dependencies": {
-    "minimist": "~0.0.1"
+    "optimist": "johnnylambada/node-optimist"
   },
   "repository": {
     "type": "git",
